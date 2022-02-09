@@ -58,7 +58,7 @@ case $line in
     echo "dev-vcs/git -gpg" >> /etc/portage/package.use
     emerge -uvNDq @world
     ;;
-  latest-stage3-amd64)
+  latest-stage3-amd64-desktop-openrc)
     emerge -uvNDq @world
     printf "big emerge complete\n"
     ;;
