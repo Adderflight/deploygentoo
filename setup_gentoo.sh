@@ -168,9 +168,9 @@ case $stage3select in
     ;;
 esac
 
-STAGE3_PATH_URL=http://distfiles.gentoo.org/releases/amd64/autobuilds/$GENTOO_TYPE.txt
+STAGE3_PATH_URL=https://gentoo.osuosl.org/releases/amd64/autobuilds/$GENTOO_TYPE.txt
 STAGE3_PATH=$(curl -s $STAGE3_PATH_URL | grep -v "^#" | cut -d" " -f1)
-STAGE3_URL=http://distfiles.gentoo.org/releases/amd64/autobuilds/$STAGE3_PATH
+STAGE3_URL=https://gentoo.osuosl.org/releases/amd64/autobuilds/current-stage3-amd64-desktop-openrc/stage3-amd64-desktop-openrc-20220130T170547Z.tar.xz
 touch /mnt/gentoo/gentootype.txt
 echo $GENTOO_TYPE >> /mnt/gentoo/gentootype.txt
 cd /mnt/gentoo/
