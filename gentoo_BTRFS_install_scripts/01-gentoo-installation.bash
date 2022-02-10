@@ -4,7 +4,7 @@
 
 # Chroot
 ## Please, run this right after running script 00
-mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo
+mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda4 /mnt/gentoo
 
 ## create dirs for mounts
 cd /mnt/gentoo
