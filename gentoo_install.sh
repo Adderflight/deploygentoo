@@ -15,19 +15,24 @@ sgdisk -n 2::+${swap_amt}G -t 2:8200 /dev/vda
 sgdisk -n 3:: -t 3:8300 /dev/vda
 
 # Making the filesystems
+echo "Making the filesystems"
 mkfs.vfat -n boot -F 32 /dev/vda1
 mkswap /dev/vda2
 mkfs.btrfs -L btrfsroot /dev/vda3
 swapon /dev/vda2
 
 # Create subvols for btrfs
-cd /mnt/gentoo
+echo "cd into /mnt/gentoo/"
+sleep 5
+cd /mnt/gentoo/
 btrfs subvol create root
 btrfs subvol create home
 btrfs subvol create srv
 btrfs subvol create var
 
 ## Create dirs for mounts
+echo "Creating dirs for mounting"
+sleep 5
 mkdir srv home root var boot
 
 # Mounts
