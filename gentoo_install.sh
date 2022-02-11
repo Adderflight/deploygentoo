@@ -2,7 +2,7 @@
 
 # Ask user to make sure they are connected to the internet
 echo "If you are not sure if your device is connected to the internet, hit control+c and use ifconfig to check if your network interface card has an ip address."
-sleep 10
+sleep 5
 
 # Begin partitioning
 ## Ask for the amount of swap the user wants
@@ -10,39 +10,54 @@ echo "Enter the amout of swap you want:"
 read swap_amt
 swap_amt="${swap_amt}"
 sgdisk -Zo /dev/vda
-sgdisk -n 1::+1024M -t:ef02 /dev/vda
+sgdisk -n 1::+1024M -t 1:ef02 /dev/vda
+sleep 2
 sgdisk -n 2::+${swap_amt}G -t 2:8200 /dev/vda
+sleep 2
 sgdisk -n 3:: -t 3:8300 /dev/vda
+sleep 4
 
 # Making the filesystems
 echo "Making the filesystems"
 mkfs.vfat -n boot -F 32 /dev/vda1
-mkswap /dev/vda2
+sleep 2
+mkswap -L swap /dev/vda2
+sleep 2
 mkfs.btrfs -L btrfsroot /dev/vda3
+sleep 2
 swapon /dev/vda2
+sleep 4
 
-# Create subvols for btrfs
-echo "cd into /mnt/gentoo/"
-sleep 5
-cd /mnt/gentoo/
-btrfs subvol create root
-btrfs subvol create home
-btrfs subvol create srv
-btrfs subvol create var
+# Mount
+## Root
+mount /dev/vda3 /mnt/gentoo/
 
 ## Create dirs for mounts
+echo "cd into /mnt/gentoo/"
+sleep 2
+cd /mnt/gentoo/
 echo "Creating dirs for mounting"
-sleep 5
+sleep 2
 mkdir srv home root var boot
+
+# Mount the root partition
+mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo/
+
+# Create subvols for btrfs
+echo "subvol creation"
+btrfs subvol create root
+sleep 2
+btrfs subvol create home
+sleep 2
+btrfs subvol create srv
+sleep 2
+btrfs subvol create var
+sleep 3
 
 # Mounts
 mount -o defaults,relatime,compress=zstd,autodefrag,subvol=home /dev/vda3 /mnt/gentoo/home
 mount -o defaults,relatime,compress=zstd,autodefrag,subvol=srv /dev/vda3 /mnt/gentoo/srv
 mount -o defaults,relatime,compress=zstd,autodefrag,subvol=var /dev/vda3 /mnt/gentoo/var
-
-
-# Mount the root partition
-mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo/
 
 # Get the stage3 version (latest as of 2-11-2022; may need to be modified when a newer version is released)
 # I am not skilled enough yet to make it so it will always grab the latest stage3
@@ -99,7 +114,7 @@ source /etc/profile
 export PS1="(chroot) ${PS1}"
 
 # Mount boot partition
-mount /dev/vda1 /boot
+mount -o defaults,noatime /dev/vda1 /boot
 
 # Sync Portage
 emerge-webrsync
