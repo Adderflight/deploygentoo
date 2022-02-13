@@ -1,8 +1,7 @@
 # This is a script that will automatically install gentoo
 
-# Ask user to make sure they are connected to the internet
-echo "If you are not sure if your device is connected to the internet, hit control+c and use ifconfig to check if your network interface card has an ip address."
-sleep 5
+# Create directories
+mkdir -p /mnt/gentoo/
 
 # Begin partitioning
 ## Ask for the amount of swap the user wants
@@ -10,7 +9,7 @@ echo "Enter the amout of swap you want:"
 read swap_amt
 swap_amt="${swap_amt}"
 sgdisk -Zo /dev/vda
-sgdisk -n 1::+1024M -t 1:ef02 /dev/vda
+sgdisk -n 1::+1024M -t 1:ef00 /dev/vda
 sleep 2
 sgdisk -n 2::+${swap_amt}G -t 2:8200 /dev/vda
 sleep 2
@@ -32,15 +31,15 @@ sleep 4
 ## Root
 mount /dev/vda3 /mnt/gentoo/
 
-## Create dirs for mounts
-echo "cd into /mnt/gentoo/"
-sleep 2
-cd /mnt/gentoo/
-echo "Creating dirs for mounting"
-sleep 2
-mkdir srv home root var boot
+## Create dirs for mounts -- *NOT NECESSARY*
+#echo "cd into /mnt/gentoo/"
+#sleep 2
+#cd /mnt/gentoo/
+#echo "Creating dirs for mounting"
+#sleep 2
 
-# Mount the root partition
+# Mount the root partition and make the boot dir
+mkdir -p /mnt/gentoo/boot
 mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo/
 
 # Create subvols for btrfs
@@ -120,10 +119,15 @@ mount -o defaults,noatime /dev/vda1 /boot
 emerge-webrsync
 
 # Choose a profile
-eselect profile set default/linux/amd64/17.1/desktop
+eselect profile list
+echo "Select a profile:"
+sleep 5
+read profile_set
+profile_set="${profile_set}"
+eselect profile set ${profile_set}
 
 # Update @world set
-echo "Read a book, because it is compile time baby!"
+echo "Read a book, because it is time to compile baby!"
 sleep 2
 emerge -avuDN @world
 
@@ -155,3 +159,66 @@ eselect locale ${locale_selection}
 
 # Reload the environment
 env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
+
+# Install firmware/microcode
+emerge -a sys-kernel/linux-firmware
+
+# Install kernel sources
+emerge -a sys-kernel/gentoo-sources
+
+# Forgo a custom kernel configuration for now for debug purposes. May be changed later. A custom kernel can be created after installing gentoo.
+emerge -a sys-kernel/genkernel
+
+# Setup /etc/fstab
+cat << EOF > /etc/fstab
+# <fs>      <mountpoint>    <type>  <opts>                                              <dump/pass>
+
+shm         /dev/shm        tmpfs   nodev,nosuid,noexec                                 0 0
+
+/dev/vda3   /               btrfs   rw,noatime,compress=zstd:1,autodefrag,subvol=root   0 0
+/dev/vda3   /home           btrfs   rw,noatime,compress=zstd:1,autodefrag,subvol=home   0 0
+/dev/vda3   /srv            btrfs   rw,noatime,compress=zstd:1,autodefrag,subvol=srv    0 0
+/dev/vda3   /var            btrfs   rw,noatime,compress=zstd:1,autodefrag,subvol=var    0 0
+/dev/vda2   none            swap    sw                                                  0 0
+/dev/vda1   /boot           btrfs   rw,noatime                                          1 2
+#/dev/vda1   /boot/efi       btrfs   noauto,noatime                                      0 2
+
+EOF
+
+# Genkernel configuration and build
+echo "Remember to enable all virtio devices (at least virtio_pci and virtio_blk) and btrfs support."
+sleep 5
+genkernel --menuconfig --btrfs --virtio all
+
+# List the names of the kernel and the initrd for when the bootloader config file is edited
+ls /boot/vmlinu* /boot/initramfs*
+
+# Configure the modules
+## List the modules that need to be loaded
+echo "The modules that need to be put into the modules-load.d dir will be listed."
+sleep 3
+find /lib/modules/*/ -type f -iname '*.o' -or -iname '*.ko' | less
+mkdir -p /etc/modules-load.d
+nano -w /etc/modules-load.d/modules.conf
+
+# Set the hostname
+echo "Enter the desired hostname in nano. EX: hostname=\"tux\""
+sleep 3
+nano -w /etc/conf.d/hostname
+
+## Set domain name
+echo "Enter the desired domain name. EX: dns_domain_lo=\"homenetwork\""
+sleep 3
+nano -w /etc/conf.d/net
+
+# Install dhcpcd
+emerge -a net-misc/dhcpcd
+rc-update add dhcpcd default
+rc-service dhcpcd start
+
+# Create a STRONG root passwd
+echo "Create a STRONG root passwd."
+sleep 2
+passwd
+
+# Configure OpenRC
