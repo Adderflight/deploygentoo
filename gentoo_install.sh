@@ -29,14 +29,12 @@ sleep 4
 
 # Mount
 ## Root
-mount /dev/vda3 /mnt/gentoo/
+#mount /dev/vda3 /mnt/gentoo/
 
-## Create dirs for mounts -- *NOT NECESSARY*
-#echo "cd into /mnt/gentoo/"
-#sleep 2
-#cd /mnt/gentoo/
-#echo "Creating dirs for mounting"
-#sleep 2
+# cd into /mnt/gentoo/
+echo "cd into /mnt/gentoo/"
+sleep 1
+cd /mnt/gentoo/
 
 # Mount the root partition and make the boot dir
 mkdir -p /mnt/gentoo/boot
