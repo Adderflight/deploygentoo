@@ -222,3 +222,44 @@ sleep 2
 passwd
 
 # Configure OpenRC
+echo "Make changes to rc.conf as needed."
+sleep 2
+nano -w /etc/rc.conf
+echo "Configure the keyboard."
+sleep 2
+nano -w /etc/conf.d/keymaps
+echo "Configure the clock. Make sure clock=\"local\""
+sleep 4
+nano -w /etc/conf.d/hwclock
+
+# Install a system logger
+emerge -a app-admin/sysklogd
+
+# Install cronie
+emerge -a sys-process/cronie
+## Enable cronie (cron)
+rc-update add cronie default
+
+# Install mlocate for better indexing
+emerge -a sys-apps/mlocate
+
+# Install btrfs-progs
+emerge -a sys-fs/btrfs-progs
+
+# Install grub
+echo "Emerging grub."
+emerge -a sys-boot/grub
+## Configure
+grub-install --target=x86_64-efi --efi-directory=/boot
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# Reboot
+exit
+cd
+umount -l /mnt/gentoo/dev
+umount -l /mnt/gentoo/run
+umount -l /mnt/gentoo/proc
+umount -l /mnt/gentoo/sys
+reboot
+
+# Finalizing
