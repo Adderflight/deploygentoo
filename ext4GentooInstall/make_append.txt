@@ -1,0 +1,16 @@
+COMMON_FLAGS="-march=native -O2 -pipe"
+GRUB_PLATFORMS="efi-64"
+
+USE="-systemd -emacs -xemacs -accessibility -altivec -aqua -connman -coreaudio -ibm -infiniband -mule -neon -yahoo vim-syntax X opengl nvidia"
+
+VIDEO_CARDS="intel nvidia"
+
+ACCEPT_LICENSE="*"
+
+#Enable this if you like living on the edge
+ACCEPT_KEYWORDS="~amd64"
+
+make_opts="-j$(( $( nproc ) + 0 ))"
+MAKEOPTS="${make_opts}"
+
+GENTOO_MIRRORS="http://www.gtlib.gatech.edu/pub/gentoo https://gentoo.osuosl.org/ http://gentoo.osuosl.org/ https://mirrors.rit.edu/gentoo/ http://mirrors.rit.edu/gentoo/ http://gentoo.mirrors.tds.net/gentoo"
