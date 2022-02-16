@@ -29,10 +29,7 @@ sleep 4
 
 # Mount
 ## Root
-#mount /dev/vda3 /mnt/gentoo/
-# Mount the root partition and make the boot dir
-mkdir -p /mnt/gentoo/boot
-mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo/
+mount /dev/vda3 /mnt/gentoo/
 
 # cd into /mnt/gentoo/
 echo "cd into /mnt/gentoo/"
