@@ -29,7 +29,7 @@ sleep 4
 
 # Mount
 ## Root
-mount /dev/vda3 /mnt/gentoo/
+#mount /dev/vda3 /mnt/gentoo/
 
 # cd into /mnt/gentoo/
 echo "cd into /mnt/gentoo/"
@@ -58,7 +58,8 @@ mount -o defaults,relatime,compress=zstd,autodefrag,subvol=var /dev/vda3 /mnt/ge
 
 # Get the stage3 version (latest as of 2-11-2022; may need to be modified when a newer version is released)
 # I am not skilled enough yet to make it so it will always grab the latest stage3
-links https://gentoo.osuosl.org/releases/amd64/autobuilds/current-stage3-amd64-desktop-openrc/stage3-amd64-desktop-openrc-20220130T170547Z.tar.xz
+echo "Select the \"desired\" stage3."
+links https://gentoo.osuosl.org/releases/amd64/autobuilds/current-stage3-amd64-desktop-openrc/
 
 # Unpack the stage3 tarball
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
