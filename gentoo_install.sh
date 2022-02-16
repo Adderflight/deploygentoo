@@ -29,16 +29,12 @@ sleep 4
 
 # Mount
 ## Root
-#mount /dev/vda3 /mnt/gentoo/
+mount /dev/vda3 /mnt/gentoo/
 
 # cd into /mnt/gentoo/
 echo "cd into /mnt/gentoo/"
 sleep 1
 cd /mnt/gentoo/
-
-# Mount the root partition and make the boot dir
-mkdir -p /mnt/gentoo/boot
-mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo/
 
 # Create subvols for btrfs
 echo "subvol creation"
@@ -50,6 +46,10 @@ btrfs subvol create srv
 sleep 2
 btrfs subvol create var
 sleep 3
+
+# Mount the root partition and make the boot dir
+mkdir -p /mnt/gentoo/boot
+mount -o defaults,noatime,compress=zstd,autodefrag,subvol=root /dev/vda3 /mnt/gentoo/
 
 # Mounts
 mount -o defaults,relatime,compress=zstd,autodefrag,subvol=home /dev/vda3 /mnt/gentoo/home
@@ -258,6 +258,8 @@ umount -l /mnt/gentoo/dev
 umount -l /mnt/gentoo/run
 umount -l /mnt/gentoo/proc
 umount -l /mnt/gentoo/sys
+echo "Rebooting in five seconds."
+sleep 5
 reboot
 
 # Finalizing
